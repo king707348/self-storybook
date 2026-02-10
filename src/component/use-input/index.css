@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+
+.use--small{
+    font-size: .75rem;
+}
+.use--medium{
+    font-size: 1rem;
+}
+.use--large{
+    font-size: 1.25rem;
+}
+
