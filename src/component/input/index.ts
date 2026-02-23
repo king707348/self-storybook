@@ -1,17 +1,9 @@
 import { html } from 'lit';
 import { styleMap } from 'lit/directives/style-map.js';
 
-import './index.css';
+import type { UseInputProps } from "./types";
 
-export interface UseInputProps {
-  type?: 'text' | 'password' | 'email' | 'number' | 'file' | 'date' | 'color' | 'checkbox' | 'radio' | 'range' | 'search' | 'tel' | 'url';
-  className?: string
-  style?: Record<string, string | number>
-  size?: 'small' | 'medium' | 'large'
-  placeHolder?: string
-  pattern?: string
-  onInput?: (e: Event) => void
-}
+import './index.css';
 
 export const UseInput = ({ 
     type, 
@@ -21,12 +13,11 @@ export const UseInput = ({
     placeHolder, 
     onInput 
 }: UseInputProps) => {
-  const mode = []
+  const mode = ['border-0']
   if(className) mode.push(className)
   if(size) mode.push(`use--${size}`)
     
   const setPattern = type === 'email' ? `pattern=^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$`: ""
-  console.log(setPattern)
 
   return html`
     <input
