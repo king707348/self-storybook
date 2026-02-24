@@ -3,6 +3,7 @@ export interface UseInputProps {
   className?: string
   style?: Record<string, string | number>
   size?: 'small' | 'medium' | 'large'
+  errorMessage?: string
   placeHolder?: string
   onInput?: (e: Event) => void
 }

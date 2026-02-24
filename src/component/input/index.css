@@ -10,3 +10,12 @@
     font-size: 1.25rem;
 }
 
+input[type="email"]:invalid{
+  
+
+}
+input[type="email"]:focus-visible:invalid{
+  outline: 0;
+  
+}
+
