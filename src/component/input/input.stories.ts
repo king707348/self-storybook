@@ -45,12 +45,12 @@ class StatefulInputWraper extends LitElement {
         dynamicErr: { type: String}
     }
     args: any
-    dynamicErr: string
+    dynamicErr: boolean | undefined
 
     constructor() {
         super();
         this.args = {};
-        this.dynamicErr = "";
+        this.dynamicErr = undefined;
     }
 
     protected createRenderRoot() {
@@ -58,22 +58,26 @@ class StatefulInputWraper extends LitElement {
     }
 
     render() {
-        const { type, className, placeHolder, ...resArgs } = this.args
+        const { type, className, placeHolder, showFeedback, pass, fail, ...resArgs } = this.args
         const currentPlaceHolder = placeHolder
             ? placeHolder
             : placeHolderMap[type] || "";
 
-        const useClass = ["text", "password", "email", "number","search", "tel", "url"].includes(type) ? "border-b-1" : "";
+        const useClass = ["text", "password", "email", "number","search", "tel", "url"].includes(type) ? " border-b-1" : "";
+        const needsFeedback = ["email"].includes(type)
 
         return UseInput({
             type, 
             placeHolder: currentPlaceHolder,
             className: [className, useClass].join(''),
+            showFeedback: needsFeedback,
+            pass,
+            fail,
             ...resArgs,
             onInput: (e) => {
                 if(type === 'email') {
                     const result = pattern_limit(e)
-                    this.dynamicErr = result.success ? "Pass" : "Please enter a valid email address."
+                    this.dynamicErr = result.success
                 }
             },
             errorMessage: this.dynamicErr
@@ -88,15 +92,11 @@ if (!customElements.get("stateful-input-wrapper")) {
 const meta = {
   title: "component/Input",
   tags: ["autodocs"],
-  render: (args) => html`<stateful-input-wrapper 
-    .args=${args} 
-    type=${args.type} 
-    className=${args.className}
-    style=${styleMap(args.style || {})}
-    size=${args.size}
-    placeHolder=${args.placeHolder}
-  />`,
   argTypes: {
+    // 在面板上徹底隱藏，不讓使用者看到
+    showFeedback: {
+        table: { disable: false }
+    },
     type: {
       control: {
         type: "select",
@@ -114,8 +114,28 @@ const meta = {
       options: ["small", "medium", "large"],
     },
     placeHolder: {
-      control: "text"
+      control: "text",
     },
+    pass: {
+        control: "text",
+        if: { arg: 'showFeedback', eq: true }
+    },
+    fail: {
+        control: "text" ,
+        if: { arg: 'showFeedback', eq: true }
+    }
+  },
+  render: (args) => {
+    return html`<stateful-input-wrapper 
+        .args=${args} 
+        type=${args.type} 
+        className=${args.className}
+        style=${styleMap(args.style || {})}
+        size=${args.size}
+        placeHolder=${args.placeHolder}
+        pass=${args.pass}
+        fail=${args.fail}
+    />`
   },
   args: { onInput: fn() },
 } satisfies Meta<UseInputProps>;
@@ -125,18 +145,18 @@ type Story = StoryObj<UseInputProps>;
 export const Text: Story = {
   args: {
     type: "text",
-    className: "",
-    style: { "z-index": 1 },
+    className: "font-bold",
+    style: {},
     size: "medium",
     placeHolder: placeHolderMap.text
-  },
+  }
 };
 
 export const Password: Story = {
   args: {
     type: "password",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
     placeHolder: placeHolderMap.password,
   },
@@ -145,17 +165,19 @@ export const Email: Story = {
   args: {
     type: "email",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
     placeHolder: placeHolderMap.email,
     errorMessage: "",
+    pass: "Valid email address",
+    fail: "Please enter a valid email address"
   },
 };
 export const Number: Story = {
   args: {
     type: "number",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
     placeHolder: placeHolderMap.number,
   },
@@ -164,7 +186,7 @@ export const File: Story = {
   args: {
     type: "file",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
   },
 };
@@ -172,7 +194,7 @@ export const Date: Story = {
   args: {
     type: "date",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
   },
 };
@@ -180,7 +202,7 @@ export const Color: Story = {
   args: {
     type: "color",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
   },
 };
@@ -188,7 +210,7 @@ export const Checkbox: Story = {
   args: {
     type: "checkbox",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
   },
 };
@@ -196,7 +218,7 @@ export const Radio: Story = {
   args: {
     type: "radio",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
   },
 };
@@ -204,7 +226,7 @@ export const Range: Story = {
   args: {
     type: "range",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
   },
 };
@@ -212,7 +234,7 @@ export const Search: Story = {
   args: {
     type: "search",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
   },
 };
@@ -220,7 +242,7 @@ export const Tel: Story = {
   args: {
     type: "tel",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
     placeHolder: placeHolderMap.tel,
   },
@@ -229,7 +251,7 @@ export const Url: Story = {
   args: {
     type: "url",
     className: "",
-    style: { "z-index": 1 },
+    style: {},
     size: "medium",
     placeHolder: placeHolderMap.url,
   },

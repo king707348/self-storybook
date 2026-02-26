@@ -11,13 +11,15 @@ export const UseInput = ({
     style,
     size, 
     errorMessage,
+    pass,
+    fail,
     placeHolder, 
     onInput 
 }: UseInputProps) => {
   const mode:string[] = ['border-0', 'bg-blue-50' ,'w-fit']
   if(className) mode.push(className)
   if(size) mode.push(`use--${size}`)
-    console.log(errorMessage, mode.join(' '))
+  console.log(mode.join(' '))
 
   return html`
     <div class="flex flex-col gap-1">
@@ -29,7 +31,11 @@ export const UseInput = ({
         placeholder=${placeHolder}
         @input=${onInput}
       />
-      <small class="text-red-500">${errorMessage}</small>
+      ${
+        errorMessage == undefined && html``
+        || !errorMessage && html`<small class="text-red-500">${fail}</small>`
+        || errorMessage && html`<small class="text-green-500">${pass}</small>`
+      }
     </div>
   `
 };
